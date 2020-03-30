@@ -30,4 +30,4 @@ PG_MODULE_MAGIC;
 // #include "vec_to_kurtosis.c"
 #include "hist_2d.c"
 #include "hist_md.c"
-
+#include "vec_to_stats.c"
