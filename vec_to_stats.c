@@ -118,6 +118,7 @@ vec_to_stats_transfn(PG_FUNCTION_ARGS)
         default:
           elog(ERROR, "Input array length > 4");
         }
+        break;
       default:
         elog(ERROR, "Unknown elemTypeId!");
       }
