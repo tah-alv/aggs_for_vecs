@@ -76,7 +76,7 @@ vec_to_stats_transfn(PG_FUNCTION_ARGS)
       elog(ERROR, "Unknown elemTypeId!");
     }
     for (i=0; i < arrayLength; i++)
-      state->state.dnulls[i] = false;
+      state->state.dnulls[i] = true;
   } else {
     elemTypeId = state->inputElementType;
     arrayLength = state->state.nelems;
@@ -89,25 +89,38 @@ vec_to_stats_transfn(PG_FUNCTION_ARGS)
     ereport(ERROR, (errmsg("All arrays must be the same length, but we got %d vs %d", currentLength, arrayLength)));
   }
 
-  if (currentNulls[i]) {
-    // do nothing: nulls can't change the result.
-  } else {
-    state->state.dnulls[i] = false;
-    switch (elemTypeId) {
-    case INT4OID:
-      state->vecvalues[0].i32 += DatumGetInt32(currentVals[0]);
-      minIndex = DatumGetInt32(currentVals[1]);
-      if (minIndex < state->vecvalues[1].i32) {
-        state->vecvalues[1].i32 = minIndex;
+  for (i=0; i < arrayLength; i++) {
+    if (currentNulls[i]) {
+      // do nothing: nulls can't change the result.
+    } else {
+      state->state.dnulls[i] = false;
+      switch (elemTypeId) {
+      case INT4OID:
+        switch (i) {
+        case 0:
+          state->vecvalues[0].i32 += DatumGetInt32(currentVals[0]);
+          break;
+        case 1:
+          minIndex = DatumGetInt32(currentVals[1]);
+          if (minIndex < state->vecvalues[1].i32) {
+            state->vecvalues[1].i32 = minIndex;
+          }
+          break;
+        case 2:
+          maxIndex = DatumGetInt32(currentVals[2]);
+          if (maxIndex > state->vecvalues[2].i32) {
+            state->vecvalues[2].i32 = maxIndex;
+          }
+          break;
+        case 3:
+          state->vecvalues[3].i32 += DatumGetInt32(currentVals[3]);
+          break;
+        default:
+          elog(ERROR, "Input array length > 4");
+        }
+      default:
+        elog(ERROR, "Unknown elemTypeId!");
       }
-      maxIndex = DatumGetInt32(currentVals[2]);
-      if (maxIndex > state->vecvalues[2].i32) {
-        state->vecvalues[2].i32 = maxIndex;
-      }
-      state->vecvalues[3].i32 += DatumGetInt32(currentVals[3]);
-      break;
-    default:
-      elog(ERROR, "Unknown elemTypeId!");
     }
   }
   PG_RETURN_POINTER(state);
