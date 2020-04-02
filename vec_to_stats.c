@@ -4,11 +4,14 @@ Datum vec_to_stats_transfn(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(vec_to_stats_transfn);
 
 /**
- * Returns an array of n elements,
- * which each element is the sum of non-NULLs found in that position
- * from all input arrays.
+ * Returns an array of 4 elements
+ * after processing the output of subarray_to_sum_stats
+ * element 1 is the sum
+ * element 2 is the min
+ * element 3 is the max
+ * element 4 is the sum
  *
- * by Paul A. Jungwirth
+ * by Todd Hay
  */
 Datum
 vec_to_stats_transfn(PG_FUNCTION_ARGS)
