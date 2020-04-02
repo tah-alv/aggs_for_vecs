@@ -68,8 +68,7 @@ vec_to_stats_transfn(PG_FUNCTION_ARGS)
     switch (elemTypeId) {
     case INT4OID:
       state->vecvalues[0].i32 = 0; // sum
-      /* state->vecvalues[1].i32 = INT_MAX; // minIndex */
-      state->vecvalues[1].i32 = 50000; // minIndex
+      state->vecvalues[1].i32 = 0x7FFFFFFF; // minIndex
       state->vecvalues[2].i32 = -1; // maxIndex
       state->vecvalues[3].i32 = 0; // count
       break;
